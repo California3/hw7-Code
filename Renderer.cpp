@@ -58,7 +58,7 @@ void Renderer::Render(const Scene& scene)
                     Vector3f dir = normalize(Vector3f(-x, y, 1));
 
                     for (int k = 0; k < scene_spp_per_area; k++){ // multiple samples per pixel
-                        Vector3f tempresult = scene.castRay(Ray(eye_pos, dir), 0) / scene_spp_per_area
+                        Vector3f tempresult = scene.castRay(Ray(eye_pos, dir), 0) / scene_spp_per_area;
                         framebuffer[m] += tempresult;  
                         framebuffer_area[k] += tempresult;
                     }
