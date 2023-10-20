@@ -51,25 +51,23 @@ void Renderer::Render(const Scene& scene)
                 // iterate over 4 sample-areas per pixel
                 Vector3f framebuffer_area[area_size];
                 int scene_spp_per_area = scene.spp / area_size;
-                for (int k = 0; k < area_size; k++){
-                    float x = (2 * (i + samples_poses[k].x) / (float)scene.width - 1) *
+                for (int k_area = 0; k_area < area_size; k_area++){
+                    float x = (2 * (i + samples_poses[k_area].x) / (float)scene.width - 1) *
                             imageAspectRatio * scale;
-                    float y = (1 - 2 * (j + samples_poses[k].y) / (float)scene.height) * scale;
+                    float y = (1 - 2 * (j + samples_poses[k_area].y) / (float)scene.height) * scale;
                     Vector3f dir = normalize(Vector3f(-x, y, 1));
 
                     for (int k = 0; k < scene_spp_per_area; k++){ // multiple samples per pixel
                         Vector3f tempresult = scene.castRay(Ray(eye_pos, dir), 0) / scene_spp_per_area;
                         framebuffer[m] += tempresult;  
-                        framebuffer_area[k] += tempresult;
+                        framebuffer_area[k_area] += tempresult;
                     }
                 }
 
                 framebuffer[m] = framebuffer[m] / area_size;
-                for (int k = 0; k < area_size; k++){
-                    if(framebuffer[m].norm() < framebuffer_area[k].norm()){
-                        framebuffer[m] = framebuffer_area[k];
-                    }
-                }
+                // for (int k_area = 0; k_area < area_size; k_area++){
+                //     framebuffer[m] = Vector3f::Min(framebuffer_area[k_area], framebuffer[m]);
+                // }
             }else{
                 float x = (2 * (i + 0.5) / (float)scene.width - 1) *
                       imageAspectRatio * scale;
