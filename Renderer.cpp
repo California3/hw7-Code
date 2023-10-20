@@ -49,6 +49,7 @@ void Renderer::Render(const Scene& scene)
             //TODO: modify this function to support anti-aliasing (Mutation-supersampling)
             if(enable_super_sampling){
                 // iterate over 4 sample-areas per pixel
+                Vector3f framebuffer_area[area_size];
                 int scene_spp_per_area = scene.spp / area_size;
                 for (int k = 0; k < area_size; k++){
                     float x = (2 * (i + samples_poses[k].x) / (float)scene.width - 1) *
@@ -57,11 +58,18 @@ void Renderer::Render(const Scene& scene)
                     Vector3f dir = normalize(Vector3f(-x, y, 1));
 
                     for (int k = 0; k < scene_spp_per_area; k++){ // multiple samples per pixel
-                        framebuffer[m] += scene.castRay(Ray(eye_pos, dir), 0) / scene_spp_per_area;  
+                        Vector3f tempresult = scene.castRay(Ray(eye_pos, dir), 0) / scene_spp_per_area
+                        framebuffer[m] += tempresult;  
+                        framebuffer_area[k] += tempresult;
                     }
                 }
 
                 framebuffer[m] = framebuffer[m] / area_size;
+                for (int k = 0; k < area_size; k++){
+                    if(framebuffer[m].norm() < framebuffer_area[k].norm()){
+                        framebuffer[m] = framebuffer_area[k];
+                    }
+                }
             }else{
                 float x = (2 * (i + 0.5) / (float)scene.width - 1) *
                       imageAspectRatio * scale;
