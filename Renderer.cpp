@@ -29,23 +29,49 @@ void Renderer::Render(const Scene& scene)
 
     float progress = 0.0f;
 
+    // [[0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.75]]
+    std::vector<Vector2f> samples_poses = {
+        Vector2f(0.25, 0.25),
+        Vector2f(0.75, 0.25),
+        Vector2f(0.25, 0.75),
+        Vector2f(0.75, 0.75)
+    };
+    int area_size = (int)samples_poses.size();
+    bool enable_super_sampling = false;
+
     #pragma omp parallel for num_threads(8) // use multi-threading for speedup if openmp is available
     for (uint32_t j = 0; j < scene.height; ++j) {
         for (uint32_t i = 0; i < scene.width; ++i) {
 
             int m = i + j * scene.width;
             // generate primary ray direction
-            
-            float x = (2 * (i + 0.5) / (float)scene.width - 1) *
+
+            //TODO: modify this function to support anti-aliasing (Mutation-supersampling)
+            if(enable_super_sampling){
+                // iterate over 4 sample-areas per pixel
+                int scene_spp_per_area = scene.spp / area_size;
+                for (int k = 0; k < area_size; k++){
+                    float x = (2 * (i + samples_poses[k].x) / (float)scene.width - 1) *
+                            imageAspectRatio * scale;
+                    float y = (1 - 2 * (j + samples_poses[k].y) / (float)scene.height) * scale;
+                    Vector3f dir = normalize(Vector3f(-x, y, 1));
+
+                    for (int k = 0; k < scene_spp_per_area; k++){ // multiple samples per pixel
+                        framebuffer[m] += scene.castRay(Ray(eye_pos, dir), 0) / scene_spp_per_area;  
+                    }
+                }
+
+                framebuffer[m] = framebuffer[m] / area_size;
+            }else{
+                float x = (2 * (i + 0.5) / (float)scene.width - 1) *
                       imageAspectRatio * scale;
-            float y = (1 - 2 * (j + 0.5) / (float)scene.height) * scale;
+                float y = (1 - 2 * (j + 0.5) / (float)scene.height) * scale;
 
-            Vector3f dir = normalize(Vector3f(-x, y, 1));
+                Vector3f dir = normalize(Vector3f(-x, y, 1));
 
-            //TODO: modify this function to support anti-aliasing
-
-            for (int k = 0; k < scene.spp; k++){ // multiple samples per pixel
-                framebuffer[m] += scene.castRay(Ray(eye_pos, dir), 0) / scene.spp;  
+                for (int k = 0; k < scene.spp; k++){ // multiple samples per pixel
+                    framebuffer[m] += scene.castRay(Ray(eye_pos, dir), 0) / scene.spp;  
+                }
             }
         }
         progress += 1.0f / (float)scene.height;

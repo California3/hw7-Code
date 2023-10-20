@@ -14,13 +14,13 @@ int main(int argc, char** argv)
 {
 
     // change the resolution for quick debugging
-    Scene scene(64, 64);
+    // Scene scene(64, 64);
 
-    // Scene scene(512, 512); // use this resolution for final rendering
+    Scene scene(512, 512); // use this resolution for final rendering
 
     scene.RussianRoulette = 0.8;
-    // scene.spp = 64;
-    scene.spp = 16;
+    scene.spp = 64;
+    // scene.spp = 16;
     scene.maxDepth = 5;
 
     Material* red = new Material(DIFFUSE, Vector3f(0.0f));
