@@ -7,7 +7,7 @@
 
 #include "Vector.hpp"
 
-enum MaterialType { DIFFUSE};
+enum MaterialType { DIFFUSE, GLASS};
 
 class Material{
 private:
@@ -142,6 +142,22 @@ Vector3f Material::sample(const Vector3f &wi, const Vector3f &N){
             
             break;
         }
+        case GLASS:
+        {
+            float kr;
+            fresnel(wi, N, ior, kr);
+            float x_1 = get_random_float();
+            if (x_1 < kr) {
+                // reflection, kr;
+                return reflect(wi, N);
+            }
+            else {
+                // refraction, 1 - kr;
+                Vector3f wt = refract(wi, N, ior);
+                return wt;
+            }
+            break;
+        }
     }
 }
 
@@ -154,6 +170,20 @@ float Material::pdf(const Vector3f &wi, const Vector3f &wo, const Vector3f &N){
                 return 0.5f / M_PI;
             else
                 return 0.0f;
+            break;
+        }
+        case GLASS:
+        {   
+            if (dotProduct(wo, N) > 0.0f) {
+                // reflection;
+                // Only One Direction When Reflection.
+                return 1.0f;
+            }
+            else {
+                // refraction;
+                // Only One Direction When Refraction.
+                return 1.0f;
+            }
             break;
         }
     }
@@ -171,6 +201,19 @@ Vector3f Material::eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &
             }
             else
                 return Vector3f(0.0f);
+            break;
+        }
+        case GLASS:
+        {
+            float kr;
+            fresnel(wi, N, ior, kr);
+            if (dotProduct(wo, N) > 0.0f) {
+                // reflection, kr;
+                return kr;
+            }else{
+                // refraction, 1 - kr;
+                return 1-kr;   
+            }
             break;
         }
     }
