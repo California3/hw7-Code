@@ -1,0 +1,6 @@
+Render complete: 
+SPP: 16
+RussianRoulette: 1
+Time taken: 0 hours
+          : 0 minutes
+          : 14 seconds
