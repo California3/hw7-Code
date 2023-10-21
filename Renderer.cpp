@@ -88,7 +88,7 @@ void Renderer::Render(const Scene& scene)
 
     // save framebuffer to file
     // new file name, scene.spp-scene.RussianRoulette-binary.ppm
-    std::string filename =  std::to_string(scene.spp) + "-" + std::to_string((int)(scene.RussianRoulette * 100.0f)) + "-binary.ppm";
+    std::string filename =  "binary-" + std::to_string(scene.spp) + "-" + std::to_string((int)(scene.RussianRoulette * 100.0f)) + ".ppm";
     FILE* fp = fopen(filename.c_str(), "wb");
     (void)fprintf(fp, "P6\n%d %d\n255\n", scene.width, scene.height);
     for (auto i = 0; i < scene.height * scene.width; ++i) {
