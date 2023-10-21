@@ -76,8 +76,8 @@ void call_by_main_original()
 
     Scene scene(512, 512); // use this resolution for final rendering
 
-    scene.RussianRoulette = 0.8;
-    scene.spp = 64;
+    scene.RussianRoulette = 0.4;
+    scene.spp = 32;
     // scene.spp = 16;
     scene.maxDepth = 3;
 
