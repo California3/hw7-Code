@@ -69,6 +69,24 @@ Vector3f Scene::castRay(const Ray &ray, int depth) const
         return inter.m->getEmission();
     }
 
+    if(depth > Scene::maxDepth){
+        return Scene::backgroundColor;
+    }
+
+    if(inter.m->getType() == GLASS){
+        Vector3f reflect_dir = reflect(ray.direction, inter.normal).normalized();
+        Vector3f refract_dir = refract(ray.direction, inter.normal, inter.m->ior).normalized();
+
+        Ray reflect_ray = Ray(inter.coords, reflect_dir);
+        Ray refract_ray = Ray(inter.coords, refract_dir);
+
+        float kr;
+        fresnel(ray.direction, inter.normal, inter.m->ior, kr);
+
+        return castRay(reflect_ray, depth + 1) * kr + castRay(refract_ray, depth + 1) * (1 - kr);
+    }
+
+
     Vector3f L_dir = Vector3f(0.0f);
     Vector3f L_indir = Vector3f(0.0f);
 

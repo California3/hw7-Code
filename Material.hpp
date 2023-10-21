@@ -142,17 +142,17 @@ Vector3f Material::sample(const Vector3f &wi, const Vector3f &N){
             
             break;
         }
-        case GLASS:
-        {
-            // uniform sample on the hemisphere
-            float x_1 = get_random_float(), x_2 = get_random_float();
-            float z = std::fabs(1.0f - 2.0f * x_1);
-            float r = std::sqrt(1.0f - z * z), phi = 2 * M_PI * x_2;
-            Vector3f localRay(r*std::cos(phi), r*std::sin(phi), z);
-            return toWorld(localRay, N);
+        // case GLASS:
+        // {
+        //     // uniform sample on the hemisphere
+        //     float x_1 = get_random_float(), x_2 = get_random_float();
+        //     float z = std::fabs(1.0f - 2.0f * x_1);
+        //     float r = std::sqrt(1.0f - z * z), phi = 2 * M_PI * x_2;
+        //     Vector3f localRay(r*std::cos(phi), r*std::sin(phi), z);
+        //     return toWorld(localRay, N);
 
-            break;
-        }
+        //     break;
+        // }
     }
 }
 
@@ -167,22 +167,22 @@ float Material::pdf(const Vector3f &wi, const Vector3f &wo, const Vector3f &N){
                 return 0.0f;
             break;
         }
-        case GLASS:
-        {   
-            Vector3f w_reflection = reflect(wi, N).normalized();
-            Vector3f w_refraction = refract(wi, N, ior).normalized();
+        // case GLASS:
+        // {   
+        //     Vector3f w_reflection = reflect(wi, N).normalized();
+        //     Vector3f w_refraction = refract(wi, N, ior).normalized();
 
-            if (dotProduct(wo, w_reflection) == 1.0f) {
-                // reflection 
-                return 1.0f;
-            }else if(dotProduct(wo, w_refraction) == 1.0f){
-                // or refraction
-                return 1.0f;
-            }else{
-                return 0.0f;
-            }
-            break;
-        }
+        //     if (dotProduct(wo, w_reflection) == 1.0f) {
+        //         // reflection 
+        //         return 1.0f;
+        //     }else if(dotProduct(wo, w_refraction) == 1.0f){
+        //         // or refraction
+        //         return 1.0f;
+        //     }else{
+        //         return 0.0f;
+        //     }
+        //     break;
+        // }
     }
 }
 
@@ -200,18 +200,18 @@ Vector3f Material::eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &
                 return Vector3f(0.0f);
             break;
         }
-        case GLASS:
-        {
-            float kr;
-            fresnel(wi, N, ior, kr);
-            if (dotProduct(wo, N) > 0.0f) {
-                // reflection, kr;
-                return kr;
-            }else{
-                return 1-kr;   
-            }
-            break;
-        }
+        // case GLASS:
+        // {
+        //     float kr;
+        //     fresnel(wi, N, ior, kr);
+        //     if (dotProduct(wo, N) > 0.0f) {
+        //         // reflection, kr;
+        //         return kr;
+        //     }else{
+        //         return 1-kr;   
+        //     }
+        //     break;
+        // }
     }
 }
 

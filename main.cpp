@@ -76,10 +76,10 @@ void call_by_main_original()
 
     Scene scene(512, 512); // use this resolution for final rendering
 
-    scene.RussianRoulette = 0.4;
+    scene.RussianRoulette = 0.8;
     scene.spp = 32;
     // scene.spp = 16;
-    scene.maxDepth = 3;
+    scene.maxDepth = 5;
 
     Material* red = new Material(DIFFUSE, Vector3f(0.0f));
     red->Kd = Vector3f(0.63f, 0.065f, 0.05f);
@@ -91,7 +91,7 @@ void call_by_main_original()
     light->Kd = Vector3f(0.65f);
 
     Material* glass = new Material(GLASS, Vector3f(0.0f));
-    glass->ior = 15.5;
+    glass->ior = 2.5;
 
     MeshTriangle floor("../models/cornellbox/floor.obj", white);
     MeshTriangle shortbox("../models/cornellbox/shortbox.obj", white);
