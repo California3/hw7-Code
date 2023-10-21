@@ -77,9 +77,9 @@ void call_by_main_original()
     Scene scene(512, 512); // use this resolution for final rendering
 
     scene.RussianRoulette = 0.8;
-    scene.spp = 64;
+    scene.spp = 32;
     // scene.spp = 16;
-    scene.maxDepth = 5;
+    scene.maxDepth = 2;
 
     Material* red = new Material(DIFFUSE, Vector3f(0.0f));
     red->Kd = Vector3f(0.63f, 0.065f, 0.05f);
@@ -87,8 +87,11 @@ void call_by_main_original()
     green->Kd = Vector3f(0.14f, 0.45f, 0.091f);
     Material* white = new Material(DIFFUSE, Vector3f(0.0f));
     white->Kd = Vector3f(0.725f, 0.71f, 0.68f);
-    Material* light = new Material(DIFFUSE, (8.0f * Vector3f(0.747f+0.058f, 0.747f+0.258f, 0.747f) + 15.6f * Vector3f(0.740f+0.287f,0.740f+0.160f,0.740f) + 18.4f *Vector3f(0.737f+0.642f,0.737f+0.159f,0.737f)));
+    Material* light = new Material(DIFFUSE, (1.0f * Vector3f(0.747f+0.058f, 0.747f+0.258f, 0.747f) + 2.6f * Vector3f(0.740f+0.287f,0.740f+0.160f,0.740f) + 3.4f *Vector3f(0.737f+0.642f,0.737f+0.159f,0.737f)));
     light->Kd = Vector3f(0.65f);
+
+    Material* glass = new Material(GLASS, Vector3f(0.0f));
+    glass->ior = 2.5;
 
     MeshTriangle floor("../models/cornellbox/floor.obj", white);
     MeshTriangle shortbox("../models/cornellbox/shortbox.obj", white);
@@ -96,6 +99,10 @@ void call_by_main_original()
     MeshTriangle left("../models/cornellbox/left.obj", red);
     MeshTriangle right("../models/cornellbox/right.obj", green);
     MeshTriangle light_("../models/cornellbox/light.obj", light);
+
+    MeshTriangle bunny("../models/bunny/bunny.obj", glass);
+    scene.Add(&bunny);
+
 
     scene.Add(&floor);
     scene.Add(&shortbox);
@@ -112,19 +119,6 @@ void call_by_main_original()
     r.Render(scene);
     auto stop = std::chrono::system_clock::now();
 
-    // store output string to a file
-    // std::ofstream ofs;
-    // std::string filename = std::to_string(scene.spp) + "-" + std::to_string((int)(scene.RussianRoulette * 100.0f)) + "-binary.txt";
-    // ofs.open(filename);
-    // ofs << "Render complete: \n";
-    // ofs << "SPP: " << scene.spp << "\n";
-    // ofs << "RussianRoulette: " << scene.RussianRoulette << "\n";
-    // ofs << "Time taken: " << std::chrono::duration_cast<std::chrono::hours>(stop - start).count() << " hours\n";
-    // ofs << "          : " << std::chrono::duration_cast<std::chrono::minutes>(stop - start).count() << " minutes\n";
-    // ofs << "          : " << std::chrono::duration_cast<std::chrono::seconds>(stop - start).count() << " seconds\n";
-
-    // ofs.close();
-
 
     std::cout << "Render complete: \n";
     std::cout << "Time taken: " << std::chrono::duration_cast<std::chrono::hours>(stop - start).count() << " hours\n";
@@ -138,7 +132,7 @@ void call_by_main_original()
 // function().
 int main(int argc, char** argv)
 {   
-    bool is_experiment = true;
+    bool is_experiment = false;
 
     if(is_experiment){
         auto scp_rr = {0.4, 0.8};

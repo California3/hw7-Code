@@ -144,18 +144,13 @@ Vector3f Material::sample(const Vector3f &wi, const Vector3f &N){
         }
         case GLASS:
         {
-            float kr;
-            fresnel(wi, N, ior, kr);
-            float x_1 = get_random_float();
-            if (x_1 < kr) {
-                // reflection, kr;
-                return reflect(wi, N);
-            }
-            else {
-                // refraction, 1 - kr;
-                Vector3f wt = refract(wi, N, ior);
-                return wt;
-            }
+            // uniform sample on the hemisphere
+            float x_1 = get_random_float(), x_2 = get_random_float();
+            float z = std::fabs(1.0f - 2.0f * x_1);
+            float r = std::sqrt(1.0f - z * z), phi = 2 * M_PI * x_2;
+            Vector3f localRay(r*std::cos(phi), r*std::sin(phi), z);
+            return toWorld(localRay, N);
+
             break;
         }
     }
@@ -174,15 +169,17 @@ float Material::pdf(const Vector3f &wi, const Vector3f &wo, const Vector3f &N){
         }
         case GLASS:
         {   
-            if (dotProduct(wo, N) > 0.0f) {
-                // reflection;
-                // Only One Direction When Reflection.
+            Vector3f w_reflection = reflect(wi, N).normalized();
+            Vector3f w_refraction = refract(wi, N, ior).normalized();
+
+            if (dotProduct(wo, w_reflection) == 1.0f) {
+                // reflection 
                 return 1.0f;
-            }
-            else {
-                // refraction;
-                // Only One Direction When Refraction.
+            }else if(dotProduct(wo, w_refraction) == 1.0f){
+                // or refraction
                 return 1.0f;
+            }else{
+                return 0.0f;
             }
             break;
         }
@@ -211,7 +208,6 @@ Vector3f Material::eval(const Vector3f &wi, const Vector3f &wo, const Vector3f &
                 // reflection, kr;
                 return kr;
             }else{
-                // refraction, 1 - kr;
                 return 1-kr;   
             }
             break;
